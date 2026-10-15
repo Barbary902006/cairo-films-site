@@ -1,0 +1,230 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Laurels from '../components/Laurels.astro';
+import { site } from '../site.config';
+import { href, useTranslations, type Lang } from '../i18n/utils';
+import { getFeaturedFilm, getFilms, getPage, localize } from '../lib/films';
+import heroDefault from '../assets/hero.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const page = (await getPage('home', lang))!;
+const { Content } = await render(page);
+const featured = await getFeaturedFilm();
+const f = featured ? localize(featured, lang) : undefined;
+const others = (await getFilms()).filter((x) => x.id !== featured?.id);
+const heroImg = f?.stills[0]?.src ?? heroDefault;
+---
+
+<Base lang={lang} description={page.data.description} image={heroImg}>
+  <section class="hero">
+    <div class="hero-media">
+      <Image src={heroImg} alt="" widths={[800, 1400, 2000, 2400]} sizes="100vw" loading="eager" fetchpriority="high" />
+    </div>
+    <div class="wrap hero-text">
+      <p class="eyebrow">{site.role} · {site.company}</p>
+      <h1>{site.name}</h1>
+      {page.data.statement && <p class="lead">{page.data.statement}</p>}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap intro">
+      <div class="prose"><Content /></div>
+      <p><a class="btn" href={href('/about/', lang)}>{t('home.aboutLink')} <span class="arrow">→</span></a></p>
+    </div>
+  </section>
+
+  {
+    featured && f && (
+      <section class="section featured">
+        <div class="wrap">
+          <p class="eyebrow">{t('home.featured')}</p>
+          <div class="feature-grid">
+            <a class="feature-poster" href={href(`/films/${featured.id}/`, lang)}>
+              <Image src={f.poster} alt={f.title} widths={[500, 900]} sizes="(max-width: 760px) 80vw, 26rem" />
+            </a>
+            <div class="feature-text">
+              <p class="status">
+                {t(`status.${f.status}` as const)}
+                {f.statusNote && <span class="note"> · {f.statusNote}</span>}
+              </p>
+              <h2>{f.title}</h2>
+              <p class="meta">
+                {[f.format, f.year].filter(Boolean).join(' · ')} · {t('film.directedBy')} {f.director}
+              </p>
+              <p class="logline">{f.logline}</p>
+              <Laurels laurels={f.laurels} />
+              <div class="btn-row">
+                <a class="btn" href={href(`/films/${featured.id}/`, lang)}>
+                  {t('film.view')} <span class="arrow">→</span>
+                </a>
+                <a class="btn" href={href('/press/', lang) + `#${featured.id}`}>
+                  {t('film.pressKit')}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    others.length > 0 && (
+      <section class="section">
+        <div class="wrap">
+          <p class="eyebrow">{t('home.allFilms')}</p>
+          <ul class="slate">
+            {others.map((o) => {
+              const lo = localize(o, lang);
+              return (
+                <li>
+                  <a href={href(`/films/${o.id}/`, lang)}>
+                    <span class="slate-title">{lo.title}</span>
+                    <span class="slate-meta">
+                      {lo.format} · {t('film.directedBy')} {lo.director}
+                    </span>
+                    <span class="status">{t(`status.${lo.status}` as const)}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: min(88vh, 56rem);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    border-block-end: 1px solid var(--rule);
+  }
+  .hero-media {
+    position: absolute;
+    inset: 0;
+  }
+  .hero-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.55;
+  }
+  .hero-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, var(--bg) 0%, transparent 55%), linear-gradient(to bottom, var(--bg) 0%, transparent 25%);
+  }
+  .hero-text {
+    position: relative;
+    padding-block: clamp(3rem, 10vh, 7rem);
+  }
+  h1 {
+    font-size: clamp(3rem, 10vw, 7.5rem);
+    letter-spacing: -0.01em;
+    margin-block-end: 1.25rem;
+  }
+  .intro {
+    display: grid;
+    gap: 2rem;
+    align-items: end;
+  }
+  @media (min-width: 900px) {
+    .intro {
+      grid-template-columns: 1fr auto;
+    }
+  }
+  .feature-grid {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+  @media (min-width: 760px) {
+    .feature-grid {
+      grid-template-columns: minmax(14rem, 26rem) 1fr;
+    }
+  }
+  .feature-poster {
+    display: block;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background: var(--bg-raised);
+    max-width: 26rem;
+  }
+  .feature-poster :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .feature-text h2 {
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+    margin-block: 0.75rem 1rem;
+  }
+  .note {
+    color: var(--ink-mute);
+  }
+  .meta {
+    color: var(--ink-mute);
+    font-size: 0.9rem;
+  }
+  .logline {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+    line-height: 1.4;
+    color: var(--ink-soft);
+    max-width: 32ch;
+    margin-block: 1.5rem 2rem;
+  }
+  .feature-text :global(.laurels) {
+    margin-block-end: 2rem;
+  }
+  .slate {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .slate li + li {
+    border-block-start: 1px solid var(--rule);
+  }
+  .slate a {
+    display: grid;
+    gap: 0.25rem 2rem;
+    padding-block: 1.5rem;
+    text-decoration: none;
+  }
+  @media (min-width: 760px) {
+    .slate a {
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+    }
+    .slate .status {
+      grid-row: 1 / 3;
+      grid-column: 2;
+      align-self: center;
+    }
+  }
+  .slate-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    line-height: 1.15;
+  }
+  .slate-meta {
+    color: var(--ink-mute);
+    font-size: 0.85rem;
+  }
+  .slate a:hover .slate-title {
+    color: var(--accent);
+  }
+</style>

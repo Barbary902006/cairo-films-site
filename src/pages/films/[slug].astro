@@ -1,0 +1,11 @@
+---
+import Film from '../../views/Film.astro';
+import { getFilms } from '../../lib/films';
+
+export async function getStaticPaths() {
+  return (await getFilms()).map((film) => ({ params: { slug: film.id }, props: { film } }));
+}
+const { film } = Astro.props;
+---
+
+<Film film={film} lang="en" />

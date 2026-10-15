@@ -1,0 +1,227 @@
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/400-italic.css';
+@import '@fontsource/cormorant-garamond/500.css';
+@import '@fontsource-variable/inter/index.css';
+@import '@fontsource/noto-naskh-arabic/400.css';
+@import '@fontsource/noto-naskh-arabic/600.css';
+
+/* ─── Tokens ─────────────────────────────────────────── */
+:root {
+  --bg: #0c0c0b;
+  --bg-raised: #151513;
+  --ink: #ece7dd;
+  --ink-soft: #b9b3a7;
+  --ink-mute: #858075;
+  --rule: #2a2925;
+  --accent: #c2a46f;
+
+  --font-display: 'Cormorant Garamond', 'Noto Naskh Arabic', Georgia, serif;
+  --font-body: 'Inter Variable', 'Noto Naskh Arabic', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --max: 76rem;
+  --measure: 38rem;
+
+  color-scheme: dark;
+}
+
+/* Arabic gets a script-appropriate stack and no letter-spacing */
+:root[lang='ar'] {
+  --font-display: 'Noto Naskh Arabic', Georgia, serif;
+  --font-body: 'Noto Naskh Arabic', 'Inter Variable', system-ui, sans-serif;
+}
+:root[lang='ar'] .eyebrow,
+:root[lang='ar'] .nav a,
+:root[lang='ar'] .btn {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* ─── Base ───────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+main {
+  flex: 1;
+}
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+a {
+  color: inherit;
+  text-decoration-color: var(--ink-mute);
+  text-underline-offset: 0.2em;
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+a:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.1;
+  margin: 0;
+  text-wrap: balance;
+}
+p {
+  margin: 0 0 1em;
+  text-wrap: pretty;
+}
+
+/* ─── Layout helpers ─────────────────────────────────── */
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.section {
+  padding-block: clamp(3rem, 8vw, 6rem);
+}
+.section + .section {
+  border-block-start: 1px solid var(--rule);
+}
+.prose {
+  max-width: var(--measure);
+  color: var(--ink-soft);
+  font-size: 1.0625rem;
+}
+.prose em {
+  color: var(--ink);
+}
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 1rem;
+}
+.page-title {
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  margin-block-end: 1.5rem;
+}
+.lead {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+  line-height: 1.35;
+  color: var(--ink);
+  max-width: 34ch;
+}
+.rule {
+  border: 0;
+  border-block-start: 1px solid var(--rule);
+  margin: 0;
+}
+
+/* Buttons and links styled as actions */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.85em 1.4em;
+  border: 1px solid var(--rule);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.arrow {
+  display: inline-block;
+  transition: transform 0.2s;
+}
+:root[dir='rtl'] .arrow {
+  transform: scaleX(-1);
+}
+a:hover .arrow {
+  transform: translateX(3px);
+}
+:root[dir='rtl'] a:hover .arrow {
+  transform: scaleX(-1) translateX(3px);
+}
+
+.status {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+:root[lang='ar'] .status {
+  letter-spacing: 0;
+}
+
+/* Film grain, very subtle */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

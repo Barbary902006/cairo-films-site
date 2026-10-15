@@ -1,0 +1,71 @@
+# ─────────────────────────────────────────────────────────────
+# Film data. Edit text here; the layout updates automatically.
+# Folder name (occupy-toronto) = page URL: /films/occupy-toronto/
+# ─────────────────────────────────────────────────────────────
+
+title: Occupy Toronto
+order: 1            # lower numbers appear first on the Films page
+featured: true      # the featured film on the Home page (keep only one true)
+
+format: Short documentary
+year: 2025          # remove or change as needed
+runtime: ''         # e.g. "18 min"
+countries: [Canada]
+language: English
+
+# One of: development, pre-production, production, post-production,
+#         completed, festival, released
+status: completed
+statusNote: Festival submissions underway
+
+director: Yousef Adris
+
+logline: >-
+  A short documentary examining student activism and anti-Palestinian
+  racism in Canada.
+
+# Paragraphs are separated by a blank line.
+synopsis: |
+  Occupy Toronto is a short documentary directed by Yousef Adris that examines student activism and anti-Palestinian racism in Canada.
+
+  Replace this paragraph with the full synopsis.
+
+credits:
+  - role: Director
+    name: Yousef Adris
+  - role: Producer
+    name: Moustafa Elbarbari
+  - role: Production Company
+    name: Cairo Films
+
+# Festival laurels. Add one block per selection or award, e.g.
+#  - festival: Hot Docs Canadian International Documentary Festival
+#    award: Official Selection
+#    year: 2026
+laurels: []
+
+# YouTube or Vimeo link (embedded automatically) or any other URL (shown as a link).
+# Leave empty to hide the trailer section.
+trailer: ''
+
+poster: ./poster.jpg
+
+stills:
+  - src: ./stills/still-01.jpg
+    caption: Still from Occupy Toronto
+    credit: Courtesy of Cairo Films
+  - src: ./stills/still-02.jpg
+    caption: Still from Occupy Toronto
+    credit: Courtesy of Cairo Films
+  - src: ./stills/still-03.jpg
+    caption: Still from Occupy Toronto
+    credit: Courtesy of Cairo Films
+
+# Optional: a full press kit PDF placed in /public/press/, e.g. /press/occupy-toronto-epk.pdf
+pressKitFile: ''
+
+# Arabic (or other language) versions. Anything left out falls back to English.
+translations:
+  ar:
+    title: احتلوا تورونتو
+    format: فيلم وثائقي قصير

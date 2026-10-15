@@ -1,0 +1,83 @@
+---
+/**
+ * A festival laurel drawn in SVG from text, so no artwork is needed.
+ * If you later receive official laurel artwork, you can still use this:
+ * the text version keeps every laurel visually consistent.
+ */
+interface Props {
+  festival: string;
+  award?: string;
+  year?: string | number;
+}
+const { festival, award = 'Official Selection', year } = Astro.props;
+
+// Leaves placed along a circular arc for one side; the other side is mirrored.
+const cx = 46, cy = 46, r = 36;
+const leaves = Array.from({ length: 8 }, (_, i) => {
+  const deg = 120 + i * 16; // from bottom-left round to top-left
+  const a = (deg * Math.PI) / 180;
+  const x = cx + r * Math.cos(a);
+  const y = cy + r * Math.sin(a);
+  return { x: x.toFixed(2), y: y.toFixed(2), rot: (deg + 90 - 35).toFixed(1) };
+});
+const stem = `M${(cx + r * Math.cos((118 * Math.PI) / 180)).toFixed(2)} ${(cy + r * Math.sin((118 * Math.PI) / 180)).toFixed(2)} A${r} ${r} 0 0 1 ${(cx + r * Math.cos((240 * Math.PI) / 180)).toFixed(2)} ${(cy + r * Math.sin((240 * Math.PI) / 180)).toFixed(2)}`;
+---
+
+<figure class="laurel">
+  <svg class="branch" viewBox="2 6 36 80" aria-hidden="true">
+    <path d={stem} fill="none" stroke="currentColor" stroke-width="1" />
+    {leaves.map((l) => <ellipse cx={l.x} cy={l.y} rx="6" ry="2.3" transform={`rotate(${l.rot} ${l.x} ${l.y})`} fill="currentColor" />)}
+  </svg>
+  <figcaption>
+    <span class="award">{award}</span>
+    <span class="fest">{festival}</span>
+    {year && <span class="year">{year}</span>}
+  </figcaption>
+  <svg class="branch mirror" viewBox="2 6 36 80" aria-hidden="true">
+    <path d={stem} fill="none" stroke="currentColor" stroke-width="1" />
+    {leaves.map((l) => <ellipse cx={l.x} cy={l.y} rx="6" ry="2.3" transform={`rotate(${l.rot} ${l.x} ${l.y})`} fill="currentColor" />)}
+  </svg>
+</figure>
+
+<style>
+  .laurel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+    color: var(--ink-soft);
+  }
+  .branch {
+    width: 1.9rem;
+    height: auto;
+    flex: none;
+    opacity: 0.85;
+  }
+  .mirror {
+    transform: scaleX(-1);
+  }
+  figcaption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 11rem;
+    line-height: 1.2;
+  }
+  .award {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .fest {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    margin-block: 0.15rem;
+  }
+  .year {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--ink-mute);
+  }
+</style>

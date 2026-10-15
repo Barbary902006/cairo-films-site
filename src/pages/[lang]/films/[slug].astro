@@ -1,0 +1,14 @@
+---
+import Film from '../../../views/Film.astro';
+import { getFilms } from '../../../lib/films';
+import { prefixedLocales, type Lang } from '../../../i18n/utils';
+
+export async function getStaticPaths() {
+  const films = await getFilms();
+  return prefixedLocales.flatMap((lang) => films.map((film) => ({ params: { lang, slug: film.id }, props: { film } })));
+}
+const { film } = Astro.props;
+const lang = Astro.params.lang as Lang;
+---
+
+<Film film={film} lang={lang} />

@@ -1,0 +1,91 @@
+---
+import { Image } from 'astro:assets';
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  stills: { src: ImageMetadata; caption?: string; credit?: string }[];
+  slug: string;
+  lang: Lang;
+  /** Show a download link under each still (press kit). */
+  downloads?: boolean;
+}
+const { stills, slug, lang, downloads = false } = Astro.props;
+const t = useTranslations(lang);
+const ext = (src: string) => src.split('?')[0].split('.').pop();
+---
+
+<ul class="stills">
+  {
+    stills.map((s, i) => (
+      <li>
+        <figure>
+          <a href={s.src.src} target="_blank" rel="noopener" class="frame">
+            <Image src={s.src} alt={s.caption ?? ''} widths={[480, 960, 1440]} sizes="(max-width: 700px) 92vw, 38rem" loading="lazy" />
+          </a>
+          {(s.caption || s.credit || downloads) && (
+            <figcaption>
+              <span>
+                {s.caption}
+                {s.credit && <span class="credit"> · {s.credit}</span>}
+              </span>
+              {downloads && (
+                <a class="dl" href={s.src.src} download={`${slug}-still-${String(i + 1).padStart(2, '0')}.${ext(s.src.src)}`}>
+                  {t('press.downloadStill')} <span class="size">{s.src.width}×{s.src.height}</span>
+                </a>
+              )}
+            </figcaption>
+          )}
+        </figure>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .stills {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    gap: clamp(1rem, 2.5vw, 2rem);
+  }
+  figure {
+    margin: 0;
+  }
+  .frame {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--bg-raised);
+  }
+  .frame :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin-block-start: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--ink-mute);
+  }
+  .credit {
+    color: var(--ink-mute);
+  }
+  .dl {
+    flex: none;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .size {
+    letter-spacing: 0;
+    color: var(--ink-mute);
+    margin-inline-start: 0.25rem;
+  }
+</style>

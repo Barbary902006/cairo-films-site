@@ -1,0 +1,97 @@
+---
+import { Image } from 'astro:assets';
+import { parseTrailer } from '../lib/films';
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  url?: string;
+  poster: ImageMetadata;
+  title: string;
+  lang: Lang;
+}
+const { url, poster, title, lang } = Astro.props;
+const t = useTranslations(lang);
+const trailer = parseTrailer(url);
+---
+
+{
+  trailer && trailer.kind !== 'link' && (
+    <div class="trailer" data-embed={trailer.embed}>
+      <Image src={poster} alt="" widths={[640, 1280, 1920]} sizes="(max-width: 76rem) 100vw, 76rem" class="cover" />
+      <button type="button" class="play" aria-label={`${t('film.playTrailer')}: ${title}`}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
+      </button>
+      <noscript>
+        <a class="btn" href={trailer.url}>{t('film.watchTrailer')}</a>
+      </noscript>
+    </div>
+  )
+}
+{
+  trailer && trailer.kind === 'link' && (
+    <a class="btn" href={trailer.url} target="_blank" rel="noopener">
+      {t('film.watchTrailer')} <span class="arrow">→</span>
+    </a>
+  )
+}
+
+<script>
+  // Load the player only when asked: keeps pages fast and avoids third-party
+  // tracking until someone actually presses play.
+  for (const el of document.querySelectorAll<HTMLElement>('.trailer[data-embed]')) {
+    el.querySelector('button')?.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = el.dataset.embed!;
+      iframe.title = 'Trailer';
+      iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+      iframe.allowFullscreen = true;
+      el.replaceChildren(iframe);
+    });
+  }
+</script>
+
+<style>
+  .trailer {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    overflow: hidden;
+  }
+  .trailer :global(.cover) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+  }
+  .trailer :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .play {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--ink) 60%, transparent);
+    background: color-mix(in srgb, var(--bg) 40%, transparent);
+    color: var(--ink);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: transform 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .play svg {
+    width: 1.6rem;
+    margin-inline-start: 0.2rem;
+  }
+  .play:hover {
+    transform: scale(1.05);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+</style>

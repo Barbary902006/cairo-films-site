@@ -1,0 +1,47 @@
+---
+import { site } from '../site.config';
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap foot">
+    <p class="cities">{site.cities.join(' · ')}</p>
+    <p>
+      <a href={`mailto:${site.email}`}>{site.email}</a>
+    </p>
+    <p class="copy">&copy; {year} {site.company}. {t('footer.rights')}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-block-start: 1px solid var(--rule);
+    padding-block: 2.5rem;
+    font-size: 0.8rem;
+    color: var(--ink-mute);
+  }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+  }
+  .foot p {
+    margin: 0;
+  }
+  .cities {
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+  }
+  a {
+    text-decoration: none;
+  }
+</style>

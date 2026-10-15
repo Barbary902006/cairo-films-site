@@ -1,0 +1,88 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../site.config';
+import { dir, href, pathWithoutLang, prefixedLocales, defaultLang, useTranslations, type Lang } from '../i18n/utils';
+import { getImage } from 'astro:assets';
+import heroDefault from '../assets/hero.jpg';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+  image?: ImageMetadata;
+}
+
+const { lang, title, description, image } = Astro.props;
+const t = useTranslations(lang);
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${site.role}, ${site.company}`;
+const desc = description ?? `${site.name}, ${site.role.toLowerCase()} and founder of ${site.company}. ${t('site.tagline')}.`;
+const og = await getImage({ src: image ?? heroDefault, width: 1200, format: 'jpg' });
+const ogUrl = new URL(og.src, Astro.site).href;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const rest = pathWithoutLang(Astro.url.pathname);
+const alternates = [defaultLang, ...prefixedLocales].map((l) => ({ lang: l, url: new URL(href(rest, l), Astro.site).href }));
+
+const sameAs = Object.values(site.links).filter(Boolean);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  alternateName: ['Moustafa El Barbari', 'مصطفى البربري'],
+  jobTitle: site.role,
+  url: new URL(href('/'), Astro.site).href,
+  worksFor: { '@type': 'Organization', name: site.company },
+  homeLocation: site.cities.map((c) => ({ '@type': 'Place', name: c })),
+  ...(sameAs.length ? { sameAs } : {}),
+};
+---
+
+<!doctype html>
+<html lang={lang} dir={dir(lang)}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    {alternates.length > 1 && alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.url} />)}
+    <meta name="theme-color" content="#0c0c0b" />
+    <link rel="icon" href={href('/favicon.svg')} type="image/svg+xml" />
+    <link rel="sitemap" href={href('/sitemap-index.xml')} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.company} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:locale" content={lang === 'ar' ? 'ar_EG' : 'en_CA'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">{t('nav.skip')}</a>
+    <Header lang={lang} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    inset-inline-start: 1rem;
+    top: -3rem;
+    z-index: 200;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 0.5rem 1rem;
+  }
+  .skip:focus {
+    top: 1rem;
+  }
+</style>

@@ -1,0 +1,59 @@
+# ─────────────────────────────────────────────────────────────
+# Film data. Edit text here; the layout updates automatically.
+# Folder name = page URL: /films/what-i-owe-to-my-mother/
+# ─────────────────────────────────────────────────────────────
+
+title: What I Owe to My Mother
+order: 2
+featured: false
+
+format: Short fiction
+year: ''
+runtime: ''
+countries: [Egypt]
+language: Arabic
+
+status: pre-production
+statusNote: ''
+
+director: Khaled Medhat
+
+logline: >-
+  A short fiction film directed by Khaled Medhat, co-produced by Cairo Films
+  and Supernova Films.
+
+synopsis: |
+  What I Owe to My Mother is a short fiction film directed by Khaled Medhat, produced by Cairo Films in co-production with Supernova Films. The film is currently in pre-production.
+
+  Replace these paragraphs with the full synopsis when you are ready to share it.
+
+credits:
+  - role: Director
+    name: Khaled Medhat
+  - role: Producer
+    name: Moustafa Elbarbari
+  - role: Production Company
+    name: Cairo Films
+  - role: Co-production
+    name: Supernova Films
+
+laurels: []
+
+trailer: ''
+
+poster: ./poster.jpg
+
+stills:
+  - src: ./stills/still-01.jpg
+    caption: Development image, What I Owe to My Mother
+    credit: Courtesy of Cairo Films
+  - src: ./stills/still-02.jpg
+    caption: Development image, What I Owe to My Mother
+    credit: Courtesy of Cairo Films
+
+pressKitFile: ''
+
+translations:
+  ar:
+    title: ما أدين به لأمي
+    format: فيلم روائي قصير

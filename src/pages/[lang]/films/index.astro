@@ -1,0 +1,9 @@
+---
+import Films from '../../../views/Films.astro';
+import { langPaths, type Lang } from '../../../i18n/utils';
+
+export const getStaticPaths = langPaths;
+const lang = Astro.params.lang as Lang;
+---
+
+<Films lang={lang} />

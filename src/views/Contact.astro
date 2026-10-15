@@ -1,0 +1,91 @@
+---
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { site } from '../site.config';
+import { useTranslations, type Lang } from '../i18n/utils';
+import { getPage } from '../lib/films';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const page = (await getPage('contact', lang))!;
+const { Content } = await render(page);
+const labels: Record<string, string> = { imdb: 'IMDb', vimeo: 'Vimeo', instagram: 'Instagram', linkedin: 'LinkedIn' };
+const links = Object.entries(site.links).filter(([, url]) => url);
+---
+
+<Base lang={lang} title={page.data.title} description={page.data.description}>
+  <section class="section">
+    <div class="wrap">
+      <h1 class="page-title">{t('contact.title')}</h1>
+      <p class="lead">{t('contact.intro')}</p>
+      <div class="prose"><Content /></div>
+
+      <dl class="contact">
+        <div>
+          <dt>{t('contact.email')}</dt>
+          <dd><a class="email" href={`mailto:${site.email}`}>{site.email}</a></dd>
+        </div>
+        <div>
+          <dt>{t('contact.based')}</dt>
+          <dd>{site.cities.join(' · ')}</dd>
+        </div>
+        {
+          links.length > 0 && (
+            <div>
+              <dt>{t('contact.elsewhere')}</dt>
+              <dd class="links">
+                {links.map(([k, url]) => (
+                  <a href={url} target="_blank" rel="me noopener">
+                    {labels[k] ?? k}
+                  </a>
+                ))}
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contact {
+    margin: clamp(2.5rem, 6vw, 4rem) 0 0;
+    border-block-start: 1px solid var(--rule);
+  }
+  .contact > div {
+    display: grid;
+    gap: 0.25rem 2rem;
+    padding-block: 1.5rem;
+    border-block-end: 1px solid var(--rule);
+  }
+  @media (min-width: 700px) {
+    .contact > div {
+      grid-template-columns: 14rem 1fr;
+      align-items: baseline;
+    }
+  }
+  dt {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    overflow-wrap: anywhere;
+  }
+  .email {
+    text-decoration: none;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+  }
+</style>

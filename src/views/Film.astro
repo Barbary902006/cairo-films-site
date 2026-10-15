@@ -1,0 +1,165 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Laurels from '../components/Laurels.astro';
+import Trailer from '../components/Trailer.astro';
+import Stills from '../components/Stills.astro';
+import { href, useTranslations, type Lang } from '../i18n/utils';
+import { localize, paragraphs, type Film } from '../lib/films';
+
+interface Props {
+  film: Film;
+  lang: Lang;
+}
+const { film, lang } = Astro.props;
+const t = useTranslations(lang);
+const f = localize(film, lang);
+const banner = f.stills[0]?.src ?? f.poster;
+const facts = [f.format, f.year, f.runtime, f.countries.join(', '), f.language].filter(Boolean);
+---
+
+<Base lang={lang} title={f.title} description={f.logline} image={banner}>
+  <section class="banner">
+    <Image src={banner} alt="" widths={[800, 1400, 2000]} sizes="100vw" loading="eager" fetchpriority="high" />
+  </section>
+
+  <section class="section head">
+    <div class="wrap">
+      <p class="status">
+        {t(`status.${f.status}` as const)}
+        {f.statusNote && <span class="note"> · {f.statusNote}</span>}
+      </p>
+      <h1 class="page-title">{f.title}</h1>
+      <p class="facts">{facts.join(' · ')}</p>
+      <p class="facts">{t('film.directedBy')} <span class="director">{f.director}</span></p>
+      <p class="logline">{f.logline}</p>
+      <Laurels laurels={f.laurels} />
+    </div>
+  </section>
+
+  {
+    f.trailer && (
+      <section class="section">
+        <div class="wrap">
+          <h2 class="eyebrow">{t('film.trailer')}</h2>
+          <Trailer url={f.trailer} poster={banner} title={f.title} lang={lang} />
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <div class="wrap cols">
+      <div>
+        <h2 class="eyebrow">{t('film.synopsis')}</h2>
+        <div class="prose">{paragraphs(f.synopsis).map((p) => <p>{p}</p>)}</div>
+      </div>
+      {
+        f.credits.length > 0 && (
+          <div>
+            <h2 class="eyebrow">{t('film.credits')}</h2>
+            <dl class="credits">
+              {f.credits.map((c) => (
+                <div>
+                  <dt>{c.role}</dt>
+                  <dd>{c.name}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  {
+    f.stills.length > 0 && (
+      <section class="section">
+        <div class="wrap">
+          <h2 class="eyebrow">{t('film.stills')}</h2>
+          <Stills stills={f.stills} slug={film.id} lang={lang} />
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <div class="wrap btn-row">
+      <a class="btn" href={href('/press/', lang) + `#${film.id}`}>{t('film.pressKit')} <span class="arrow">→</span></a>
+      <a class="btn" href={href('/films/', lang)}>{t('film.backToFilms')}</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .banner {
+    aspect-ratio: 2.39 / 1;
+    max-height: 70vh;
+    width: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+  .banner :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+  }
+  @media (max-width: 600px) {
+    .banner {
+      aspect-ratio: 16 / 9;
+    }
+  }
+  .head .page-title {
+    margin-block: 0.75rem 1rem;
+  }
+  .note {
+    color: var(--ink-mute);
+  }
+  .facts {
+    color: var(--ink-mute);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  .director {
+    color: var(--ink);
+  }
+  .logline {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 2.6vw, 1.8rem);
+    line-height: 1.35;
+    max-width: 36ch;
+    margin-block: 2rem;
+  }
+  .cols {
+    display: grid;
+    gap: 3rem;
+  }
+  @media (min-width: 900px) {
+    .cols {
+      grid-template-columns: 1.6fr 1fr;
+      gap: 5rem;
+    }
+  }
+  .credits {
+    margin: 0;
+  }
+  .credits > div {
+    padding-block: 0.8rem;
+    border-block-end: 1px solid var(--rule);
+  }
+  .credits > div:first-child {
+    border-block-start: 1px solid var(--rule);
+  }
+  dt {
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  dd {
+    margin: 0.15rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+  }
+</style>

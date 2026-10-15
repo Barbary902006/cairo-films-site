@@ -1,0 +1,30 @@
+---
+import Laurel from './Laurel.astro';
+interface Props {
+  laurels: { festival: string; award: string; year?: string | number }[];
+}
+const { laurels } = Astro.props;
+---
+
+{
+  laurels.length > 0 && (
+    <ul class="laurels">
+      {laurels.map((l) => (
+        <li>
+          <Laurel {...l} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .laurels {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem 2rem;
+  }
+</style>

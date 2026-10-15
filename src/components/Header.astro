@@ -1,0 +1,191 @@
+---
+import { site } from '../site.config';
+import { href, useTranslations, pathWithoutLang, languages, prefixedLocales, defaultLang, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const nav = [
+  { path: '/about/', label: t('nav.about') },
+  { path: '/films/', label: t('nav.films') },
+  { path: '/press/', label: t('nav.press') },
+  { path: '/contact/', label: t('nav.contact') },
+];
+const current = pathWithoutLang(Astro.url.pathname);
+const isActive = (p: string) => current === p || current.startsWith(p) || current === p.slice(0, -1);
+const otherLangs = [defaultLang, ...prefixedLocales].filter((l) => l !== lang);
+---
+
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="brand" href={href('/', lang)}>
+      <span class="brand-name">{site.name}</span>
+      <span class="brand-sub">{site.company}</span>
+    </a>
+
+    <nav class="nav desktop" aria-label="Main">
+      {
+        nav.map((n) => (
+          <a href={href(n.path, lang)} aria-current={isActive(n.path) ? 'page' : undefined}>
+            {n.label}
+          </a>
+        ))
+      }
+      {
+        otherLangs.map((l) => (
+          <a class="lang" href={href(current, l)} hreflang={l} lang={l}>
+            {languages[l].name}
+          </a>
+        ))
+      }
+    </nav>
+
+    <details class="menu">
+      <summary>
+        <span class="menu-label">{t('nav.menu')}</span>
+        <span class="burger" aria-hidden="true"><span></span><span></span></span>
+      </summary>
+      <nav class="nav" aria-label="Main">
+        {
+          nav.map((n) => (
+            <a href={href(n.path, lang)} aria-current={isActive(n.path) ? 'page' : undefined}>
+              {n.label}
+            </a>
+          ))
+        }
+        {
+          otherLangs.map((l) => (
+            <a class="lang" href={href(current, l)} hreflang={l} lang={l}>
+              {languages[l].name}
+            </a>
+          ))
+        }
+      </nav>
+    </details>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-block-end: 1px solid var(--rule);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 4.25rem;
+  }
+  .brand {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    line-height: 1.15;
+  }
+  .brand-name {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    letter-spacing: 0.02em;
+  }
+  .brand-sub {
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  :global(:root[lang='ar']) .brand-sub {
+    letter-spacing: 0;
+  }
+
+  .nav {
+    display: flex;
+    gap: clamp(1rem, 2.4vw, 2.25rem);
+  }
+  .nav a {
+    font-size: 0.74rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-soft);
+    padding-block: 0.4rem;
+    border-block-end: 1px solid transparent;
+  }
+  .nav a:hover,
+  .nav a[aria-current='page'] {
+    color: var(--ink);
+    border-block-end-color: var(--accent);
+  }
+  .nav .lang {
+    color: var(--ink-mute);
+    letter-spacing: 0;
+    text-transform: none;
+    font-size: 0.85rem;
+  }
+
+  .menu {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    .desktop {
+      display: none;
+    }
+    .menu {
+      display: block;
+    }
+    .menu summary {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      list-style: none;
+      cursor: pointer;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      padding: 0.5rem 0;
+    }
+    .menu summary::-webkit-details-marker {
+      display: none;
+    }
+    .burger {
+      display: grid;
+      gap: 5px;
+      width: 20px;
+    }
+    .burger span {
+      height: 1px;
+      background: currentColor;
+      transition: transform 0.2s;
+    }
+    .menu[open] .burger span:first-child {
+      transform: translateY(3px) rotate(45deg);
+    }
+    .menu[open] .burger span:last-child {
+      transform: translateY(-3px) rotate(-45deg);
+    }
+    .menu[open] > .nav {
+      position: absolute;
+      inset-inline: 0;
+      top: 100%;
+      flex-direction: column;
+      gap: 0;
+      padding: 0.5rem var(--gutter) 1.5rem;
+      background: var(--bg);
+      border-block-end: 1px solid var(--rule);
+    }
+    .menu[open] .nav a {
+      padding-block: 0.9rem;
+      border-block-end: 1px solid var(--rule);
+      font-size: 0.8rem;
+    }
+  }
+</style>
